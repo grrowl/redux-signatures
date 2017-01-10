@@ -1,13 +1,17 @@
+# redux-signatures
 
-# redux-scuttlebutt-signatures
+Signs redux (or flux) actions for you cryptographically.
 
-This will sign redux actions for you cryptographically.
+Designed for use with
+[redux-scuttlebutt](https://github.com/grrowl/redux-scuttlebutt)
 
-Read more at [redux-scuttlebutt](https://github.com/grrowl/redux-scuttlebutt)
+This is very much a work in progress, the API will change suddenly and without
+notice.
 
-## signatures
+## signatures available
 
-* *Ed25519*: So far the only one implemented.
+* *[Ed25519](https://ed25519.cr.yp.to/)*
+  So far the only one implemented. Works p good, signs in 1ms, verifies in 6ms.
 
 ## use
 
@@ -17,42 +21,10 @@ Read more at [redux-scuttlebutt](https://github.com/grrowl/redux-scuttlebutt)
   `signActionMiddleware(identity) => (dispatch) => (action)`
   calls `dispatch` with `action`, with publicKey and signature added
 
-## actual use
-
-* `createStore(reducer, initialState, signatures(new Ed25519()))`
-  - every dispatched action will either have no sign information
-    (in which case sign)
-  - or has sign information
-    (in which case validate)
-  - queue any dispatches until key is generated
-  - @@INIT will get signed on dispatch
-  - (neg) if someone dispatches a non-signed action, it'll get signed by us nooooo
-    - this is possible with redux-scuttlebutt. we need to differentiate between /locally/ dispatched actions and /remotely/
-    - which means back to integration with rx-sb
-
-### style 2
-
-* class
-  - `const key = new Ed25519(<privKey>)`
-  - key.privateKey -> privKey
-  - privKey can derive pubKey!
-* or more static
-  - `Ed25519 from 'redux-signatures/ed25519'`
-  - `{ signAction, verifyAction } from 'redux-signatures'`
-  - `const key = generateKey()` // has to hold pub, priv, and a func
-* `scuttlebutt({ ... })`
-  - `sign: signAction(key)`
-  - `verify: verifyAction(verifyKey)`
-* "key" functions must hold enough info to
-  - sign: with (pubKey & privKey),
-  - verify ()
-
-this is hard; obvs we should make this less "pluggable" and interate.
-
 ### style 3 💸
 
 ```js
-const { ed25519, signAction, verifyAction } from 'redux-signatures'
+const { Ed25519, signAction, verifyAction } from 'redux-signatures'
 
 // create the key object
 const key = new Ed25519(localStorage['privateKey'])
@@ -75,7 +47,7 @@ verifyAction.bind(key)
 ## roadmap
 
 * investigate better random implementation (brorand)
-*
+* more signature types
 
 ## design challenges
 

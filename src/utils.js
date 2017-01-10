@@ -20,19 +20,15 @@ export function encodeAction(action) {
   return stringify(cleanAction)
 }
 
-export function verifyAction(identity) {
-  return function (callback, action) {
-    const publicKey = action && action.meta && action.meta[META_PUBLIC_KEY],
-      signature = action && action.meta && action.meta[META_SIGNATURE]
+export function verifyAction(identity, callback, action) {
+  const publicKey = action && action.meta && action.meta[META_PUBLIC_KEY],
+    signature = action && action.meta && action.meta[META_SIGNATURE]
 
-    callback(identity.verify(encodeAction(action), publicKey, signature))
-  }
+  callback(identity.verifyPublic(encodeAction(action), signature, publicKey))
 }
 
-export function signAction(identity) {
-  return function (callback, action) {
-    callback(identity.sign(encodeAction(action)))
-  }
+export function signAction(identity, callback, action) {
+  callback(identity.sign(encodeAction(action)))
 }
 
 // Sign message (must be an array, or it'll be treated as a hex sequence)
