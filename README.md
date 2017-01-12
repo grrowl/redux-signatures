@@ -5,57 +5,79 @@ Signs redux (or flux) actions for you cryptographically.
 Designed for use with
 [redux-scuttlebutt](https://github.com/grrowl/redux-scuttlebutt)
 
-This is very much a work in progress, the API will change suddenly and without
-notice.
+This is very much a work in progress. Contributions, suggestions and questions
+welcome.
 
-## signatures available
+## signatures
 
-* *[Ed25519](https://ed25519.cr.yp.to/)*
-  So far the only one implemented. Works p good, signs in 1ms, verifies in 6ms.
+* *[Ed25519](https://ed25519.cr.yp.to/)*:
+  "High speed, high security signatures". On my machine, signs in 1ms, verifies
+  in 6ms.
+  * Sign actions against a public key
+  * Verifies actions against their signature and a public key (author)
+  * Secure against modification, but not omission.
 
 ## use
 
-* `verifyAction(identity) => (dispatch, action)`:
-  calls `dispatch(action)` if `action` is valid
-* `signAction(identity) => (dispatch, action)` or
-  `signActionMiddleware(identity) => (dispatch) => (action)`
-  calls `dispatch` with `action`, with publicKey and signature added
+### sign and verify
 
-### style 3 💸
+For `import { verifyAction, signAction } from 'redux-signatures'`,
+
+* `verifyAction(identity, dispatch, action)`:
+  calls `dispatch(true)` if `action` is valid, `dispatch(false)` otherwise.
+* `signAction(identity, dispatch, action)`:
+  calls `dispatch` with `action`, with publicKey and signature added to the
+  `meta` key
+  * publicKey and signature constants are exported as `META_PUBLIC_KEY` and
+  `META_SIGNATURE` respectively.
+
+### identity
+
+For `import { Ed25519 } from 'redux-signatures'`,
+
+* `identity = new Ed25519()`:
+  generates a new Ed25519 identity.
+* `identity = new Ed25519(privateKey)`:
+  recreates an existing or stored Ed25519 identity.
+
+### example
 
 ```js
 const { Ed25519, signAction, verifyAction } from 'redux-signatures'
 
-// create the key object
-const key = new Ed25519(localStorage['privateKey'])
+// create the identity object with a random key.
+const identity = new Ed25519()
 
-key.sign = (message) => string
-key.verify = (message, signature, pubKey) => bool
-key.publicKey = () => string
-key.privateKey = () => null
+// identity.sign = (action) => signature: string
+// identity.verify = (action, signature, pubKey) => valid: bool
+// identity.publicKey = () => hex: string
+// identity.privateKey = () => hex: string
 
-signAction(key, action) // packs message, calls key.sign, returns action w/ sig and pubkey
-verifyAction(key, action) // needs to know it's a `ed25519`... later.
-// for now can just call static ed25519.verify(message, signature, pubKey)
-// in future we might prepend the sig type to the sig itself
+// serialise action, calls identity.sign, returns action with signature
+signAction(identity, callback, action)
+// serialise action, calls identity.verify with the action and its included signature
+verifyAction(identity, callback, action)
 
-hook it like:
-signAction.bind(key)
-verifyAction.bind(key)
+// maintain identity
+const identity = new Ed25519(localStorage['privateKey'])
+localStorage['privateKey'] = identity.privateKey
+
+// now the app can render the local identity
+const initialState = {
+  identity: identity.publicKey,
+}
+
+// for use with redux-scuttlebutt
+return createStore(rootReducer, initialState, scuttlebutt({
+  verifyAsync: verifyAction.bind(undefined, identity),
+  signAsync: signAction.bind(undefined, identity),
+}))
 ```
 
 ## roadmap
 
-* investigate better random implementation (brorand)
+* investigate better random implementation (`brorand`)
 * more signature types
-
-## design challenges
-
-We want to share the `identity` state between:
-
-* scuttlebutt (dispatcherConfig) at application root
-* whoever is calling signMessage or dispatch (or enhancer)
-* redux state (reducer)
 
 ## licence
 

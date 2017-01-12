@@ -1,35 +1,13 @@
 /*
 
-this is used like: new Ed25519()
+this is used like: new Ed25519([privateKey])
 
-this ed25519 object needs to be acessible in both verifyAsync and signMessage.
-signMessage is in dispatch land
-so yes it should be a store enhancer. it can write signatures on /all/ actions
-at dispatch time (NOT ASYNC, WILL DELAY EVERYTHING ugh)
+it has the shape:
 
-so
-- called on verifyAsync (p easy, can even be static!)
-- called on dispatch/signAction
-
-as
-- store enhancer: every dispatch signs message
-- scuttlebutt ext: can be eager or not, "plugged in" at will
-  - cant live in store tho :\
-  - you can change to tho
-  - eh but not by action
-  - so mayb
-
-or
-
-- verifyMessage: takes the
-- identityReducer: generates and stores the key when value is undefined
-- signMessage(action, state.id.pubKey, state.id.privKey)
----
-
-this makes it hard to expose identity to store.
-
-if we have history, can we use another store enhancer
-
+// identity.sign = (action) => signature: string
+// identity.verify = (action, signature, pubKey) => valid: bool
+// identity.publicKey = () => hex: string
+// identity.privateKey = () => hex: string
 
 */
 
