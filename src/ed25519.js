@@ -56,7 +56,7 @@ export default class Ed25519 {
   generateKey() {
     let secret;
 
-    if (window !== undefined && window.crypto && window.crypto.getRandomValues) {
+    if (typeof window === 'object' && window.crypto && window.crypto.getRandomValues) {
       secret = new Uint8Array(256)
       window.crypto.getRandomValues(secret)
     } else {
