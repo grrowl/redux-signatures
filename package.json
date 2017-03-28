@@ -25,7 +25,9 @@
   },
   "homepage": "https://github.com/grrowl/redux-signatures",
   "dependencies": {
-    "json-stable-stringify": "^1.0.1"
+    "elliptic": "^6.3.2",
+    "json-stable-stringify": "^1.0.1",
+    "sinon": "^1.17.7"
   },
   "peerDependencies": {
     "redux-scuttlebutt": "^0.3.0"
@@ -39,7 +41,6 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "eslint-plugin-react": "^6.4.1",
-    "elliptic": "^6.3.2",
     "expect": "^1.6.0",
     "express": "^4.13.3",
     "sinon": "^1.17.6",
