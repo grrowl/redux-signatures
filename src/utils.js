@@ -44,5 +44,5 @@ export function signAction(identity, callback, action) {
 
 // Sign message (must be an array, or it'll be treated as a hex sequence)
 export function codifyMessage(message) {
-  message.split('').map(m => m.charCodeAt(0))
+  return message.split('').map(m => m.charCodeAt(0))
 }

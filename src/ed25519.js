@@ -83,18 +83,12 @@ export default class Ed25519 {
   // verify message against our own private key
   verify(message, signature) {
     // Verify signature
-    this.key.verify(message, signature)
+    return this.key.verify(codifyMessage(message), signature)
   }
 
-  // signs a message with our private key
+  // signs a message with our private key, return signature
   sign(message) {
-    // return signature
-    if (this.key) {
-      // ~1ms on my machine
-      return this.key.sign(codifyMessage(message)).toHex()
-    }
-
-    return null
-
+    // ~1ms on my machine
+    return this.key.sign(codifyMessage(message)).toHex()
   }
 }
