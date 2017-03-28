@@ -3,24 +3,10 @@ import { default as stringify } from 'json-stable-stringify'
 import { META_PUBLIC_KEY, META_SIGNATURE } from './constants'
 
 export function encodeAction(action) {
-  let cleanAction = action
-
-  if (action && action.meta) {
-    // if meta keys might be set, remove them.
-    cleanAction = {
-      ...action,
-      meta: {
-        [META_PUBLIC_KEY]: undefined,
-        [META_SIGNATURE]: undefined,
-        ...action.meta
-      }
-    }
-  }
-
-  return stringify(cleanAction)
+  return stringify(action)
 }
 
-function omitActionSignature(action) {
+export function omitActionSignature(action) {
   return {
     ...action,
     meta: {
@@ -31,19 +17,20 @@ function omitActionSignature(action) {
   }
 }
 
-// calls back with true or false, whether the action is valid
+// calls back with true or false, whether the action's embedded signature
+// metadata is accurate
 export function verifyAction(identity, callback, action) {
   const publicKey = action && action.meta && action.meta[META_PUBLIC_KEY],
     signature = action && action.meta && action.meta[META_SIGNATURE]
 
   callback(identity.verifyPublic(
-    encodeAction(omitActionSignature(signAction)),
+    encodeAction(omitActionSignature(action)),
     signature,
     publicKey
   ))
 }
 
-// calls back with the action plus signature metadata
+// calls back with the action with signature metadata added
 export function signAction(identity, callback, action) {
   callback({
     ...action,
