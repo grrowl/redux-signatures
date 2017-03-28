@@ -1,3 +1,4 @@
 require('babel-register')
 
-require('./index.spec.js')
+require('./util.spec.js')
+require('./ed25519.spec.js')
