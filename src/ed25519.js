@@ -40,17 +40,11 @@ export default class Ed25519 {
   }
 
   get privateKey() {
-    if (this.key) {
-      return toHex(this.key.getSecret())
-    }
-    return // undefined
+    return toHex(this.key.getSecret())
   }
 
   get publicKey() {
-    if (this.key) {
-      return toHex(this.key.getPublic())
-    }
-    return // undefined
+    return toHex(this.key.getPublic())
   }
 
   generateKey() {
