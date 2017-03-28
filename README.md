@@ -5,8 +5,7 @@ Signs redux (or flux) actions for you cryptographically.
 Designed for use with
 [redux-scuttlebutt](https://github.com/grrowl/redux-scuttlebutt)
 
-This is very much a work in progress. Contributions, suggestions and questions
-welcome.
+Contributions, suggestions and questions welcome.
 
 ## signatures
 
@@ -23,10 +22,11 @@ welcome.
 
 For `import { verifyAction, signAction } from 'redux-signatures'`,
 
-* `verifyAction(identity, dispatch, action)`:
-  calls `dispatch(true)` if `action` is valid, `dispatch(false)` otherwise.
-* `signAction(identity, dispatch, action)`:
-  calls `dispatch` with `action`, with publicKey and signature added to the
+* `verifyAction(identity, callback, action)`:
+  calls `callback(true)` if `action` is valid, `callback(false)` otherwise.
+  * usually `callback` is a `redux` store `dispatch`
+* `signAction(identity, callback, action)`:
+  calls `callback` with `action`, with publicKey and signature added to the
   `meta` key
   * publicKey and signature constants are exported as `META_PUBLIC_KEY` and
   `META_SIGNATURE` respectively.
@@ -37,8 +37,19 @@ For `import { Ed25519 } from 'redux-signatures'`,
 
 * `identity = new Ed25519()`:
   generates a new Ed25519 identity.
-* `identity = new Ed25519(privateKey)`:
-  recreates an existing or stored Ed25519 identity.
+* `identity = new Ed25519(privateKey: string)`:
+  recreates an existing Ed25519 identity from privateKey.
+
+* `identity.sign(message: string) => signature: string`:
+  Returns the signature for a given message.
+* `identity.verifyPublic(message: string, signature: string, publicKey:string) => valid: bool`:
+  Verifies a given message against the given signature and publicKey.
+* `identity.verify(message: string, signature: string) => valid: bool`:
+  Verifies a given message against the given signature and this identity.
+* `identity.publicKey => hex: string`:
+  Returns the identity's publicKey
+* `identity.privateKey => hex: string`:
+  Returns the identity's privateKey
 
 ### example
 
@@ -48,13 +59,9 @@ const { Ed25519, signAction, verifyAction } from 'redux-signatures'
 // create the identity object with a random key.
 const identity = new Ed25519()
 
-// identity.sign = (action) => signature: string
-// identity.verify = (action, signature, pubKey) => valid: bool
-// identity.publicKey = () => hex: string
-// identity.privateKey = () => hex: string
-
 // serialise action, calls identity.sign, returns action with signature
 signAction(identity, callback, action)
+
 // serialise action, calls identity.verify with the action and its included signature
 verifyAction(identity, callback, action)
 
@@ -73,11 +80,6 @@ return createStore(rootReducer, initialState, scuttlebutt({
   signAsync: signAction.bind(undefined, identity),
 }))
 ```
-
-## roadmap
-
-* investigate better random implementation (`brorand`)
-* more signature types
 
 ## licence
 

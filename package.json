@@ -1,7 +1,7 @@
 {
   "name": "redux-signatures",
-  "version": "0.0.4",
-  "description": "Secure cryptographic signing of redux actions",
+  "version": "0.2.0",
+  "description": "Secure cryptographic signing of Redux actions",
   "main": "lib/index.js",
   "files": [
     "dist",
